@@ -2,7 +2,7 @@
     <v-container>
         <v-card>
             <v-container grid-list-md mb-0>
-            <h2 class="text-md-center">Data User</h2>
+            <h2 class="text-md-center">Data Kendaraan</h2>
             <v-layout row wrap style="margin:10px">
                 <v-flex xs6>
                     <v-btn
@@ -14,7 +14,7 @@
                     @click="dialog=true"
                     >
                     <v-icon size="18" class="mr-2">mdi-pencil-plus</v-icon>
-                    Tambah User
+                    Tambah Kendaraan
                     </v-btn>
                 </v-flex>
                 <v-flex xs6 class="text-right">
@@ -29,7 +29,7 @@
 
             <v-data-table
                 :headers="headers"
-                :items="users"
+                :items="services"
                 :search="keyword"
                 :loading="load"
                 >
@@ -38,8 +38,9 @@
                             <tr v-for="(item,index) in items" :key="item.id">
                                 <td>{{ index+1 }}</td>
                                 <td>{{ item.name }}</td>
-                                <td>{{ item.email }}</td>
-                                <td>{{ item.password }}</td>
+                                <td>{{ item.price }}</td>
+                                <td>{{ item.type }}</td>
+                                <td>{{ item.created_at }}</td>
                                 <td class="text-center">
                                     <v-btn 
                                     icon
@@ -67,7 +68,7 @@
     <v-dialog v-model="dialog" persistent max-width="600px">
         <v-card>
             <v-card-title>
-                <span class="headline">User Profile</span>
+                <span class="headline">laykendaraan Profile</span>
                 </v-card-title>
             <v-card-text>
                 <v-container>
@@ -76,10 +77,13 @@
                             <v-text-field label="Name*" v-model="form.name" required></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                            <v-text-field label="Email*" v-model="form.email" required></v-text-field>
+                            <v-text-field label="Price*" v-model="form.price" required></v-text-field>
                         </v-col>
+                        <!-- <v-col cols="12">
+                            <v-text-field label="Type*" v-model="form.type" required></v-text-field>
+                        </v-col> -->
                         <v-col cols="12">
-                            <v-text-field label="Password*" v-model="form.password" type="password" required></v-text-field>
+                            <v-select label="Type*" v-model="form.type" :items="items" required></v-select>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -125,29 +129,31 @@ export default {
                     value:'name'
                 },
                 {
-                    text:'Email',
-                    value:'email'
+                    text:'Price',
+                    value:'price'
                 },
                 {
-                    text:'Password',
-                    value:'password'
+                    text:'Type',
+                    value:'type'
                 },
                 {
                     text:'Aksi',
                     value:null
                 },
             ],
-            users:[],
+            services:[],
+            items: ['ringan', 'sedang', 'berat'],
             snackbar: false,
             color: null,
             text: '',
             load:false,
             form: {
                 name: '',
-                email: '',
-                password: ''
+                price: '',
+                type: '',
+                created_at: ''
                 },
-                user:new FormData,
+                laykendaraan:new FormData,
                 typeInput: 'new',
                 errors: '',
                 updatedId: '',
@@ -155,25 +161,26 @@ export default {
             },
             methods: {
                 getData() {
-                    var uri = this.$apiUrl + '/user'
+                    var uri = this.$apiUrl + '/laykendaraan'
                     this.$http.get(uri).then(response => {
-                        this.users=response.data.message
+                        this.services=response.data.message
                         })
                     },
                 sendData() {
-                    this.user.append('name',this.form.name);
-                    this.user.append('email',this.form.email);
-                    this.user.append('password',this.form.password);
-                    var uri=this.$apiUrl + '/user'
+                    this.laykendaraan.append('name',this.form.name);
+                    this.laykendaraan.append('price',this.form.price);
+                    this.laykendaraan.append('type',this.form.type);
+                    this.laykendaraan.append('created_at',this.form.created_at);
+                    var uri=this.$apiUrl + '/laykendaraan'
                     this.load=true 
-                    this.$http.post(uri,this.user).then(response=>{
+                    this.$http.post(uri,this.laykendaraan).then(response=>{
                         this.snackbar=true; //mengaktifkan snackbar
                         this.color='green'; //memberi warna snackbar
                         this.text=response.data.message; //memasukkan pesan kesnackbar
 
                         this.load=false;
                         this.dialog=false
-                        this.getData(); //mengambil data user 
+                        this.getData(); //mengambil data laykendaraan 
                         this.resetForm();
                     }).catch(error =>{
                         this.errors = error
@@ -184,19 +191,20 @@ export default {
                     })
                 },
                 updateData(){
-                    this.user.append('name', this.form.name);
-                    this.user.append('email',this.form.email);
-                    this.user.append('password',this.form.password);
-                    var uri=this.$apiUrl + '/user/' + this.updatedId;
+                    this.laykendaraan.append('name', this.form.name);
+                    this.laykendaraan.append('price',this.form.price);
+                    this.laykendaraan.append('type',this.form.type);
+                    this.laykendaraan.append('created',this.form.created_at);
+                    var uri=this.$apiUrl + '/laykendaraan/' + this.updatedId;
                     this.load=true
-                    this.$http.post(uri,this.user).then(response=>{
+                    this.$http.post(uri,this.laykendaraan).then(response=>{
                         this.snackbar=true; //mengaktifkan snackbar
                         this.color = 'green'; //memberi warna snackbar
                         this.text = response.data.message; //memasukkan pesan kesnackbar
 
                         this.load = false;
                         this.dialog = false
-                        this.getData(); //mengambil data user
+                        this.getData(); //mengambil data laykendaraan
                         this.resetForm();
                         this.typeInput='new';
                     }).catch(error =>{
@@ -212,12 +220,12 @@ export default {
                     this.typeInput = 'edit';
                     this.dialog = true;
                     this.form.name = item.name;
-                    this.form.email = item.email;
-                    this.form.password = '',
+                    this.form.price = item.price;
+                    this.form.type = item.type,
                     this.updatedId = item.id
                 },
                 deleteData(deleteId){ //mengahapus data
-                var uri=this.$apiUrl + '/user/' + deleteId; //data dihapus berdasarkan id
+                var uri=this.$apiUrl + '/laykendaraan/' + deleteId; //data dihapus berdasarkan id
                 this.$http.delete(uri).then(response=>{
                         this.snackbar = true;
                         this.text = response.data.message;
@@ -242,8 +250,9 @@ export default {
                     resetForm(){
                         this.form = {
                             name : '',
-                            email : '',
-                            password : ''
+                            price : 0,
+                            type : '',
+                            created_at : ''
                         }
                     }
                 },
